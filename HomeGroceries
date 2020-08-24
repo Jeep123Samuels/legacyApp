@@ -1,0 +1,16 @@
+- Items can be created.
+- All items can be filtered with various variables
+- Items can then be added to DRAFT lists.
+
+- Grocery lists will stay in DRAFT until user moves them to another.
+- Grocery lists can be given unique names.
+
+- User can create grocery lists
+ - Should be able to drag historical items onto lists
+ - Should be able to move list to certain statuses:
+    - DRAFT: a ready to shop list
+    - SHOPPING: items can be removed to simulate shopping.
+    - COMPLETED: all items on the list are purchased.
+    - ITEMS_PENDING: items not found on list.
+
+- Items outstanding in other lists will be notified to users.
