@@ -1,20 +1,23 @@
+
+from auth_users.authentication.decorators import check_token
 from flask import request
 from flask_restful import Resource
 
 from app import db
+from helpers.decorators import db_expect
 from helpers.status_codes import StatusCodes
-from helpers.utils import save_instance
 from helpers.validations import check_required_fields
 from models.users import Users
 
 
 class UsersView(Resource):
 
+    @db_expect
+    @check_token
     def post(self):
         if check_required_fields(set(request.get_json()), Users):
-            # encrypt_password(re)
             user = Users(**request.get_json())
-            error_on_save = save_instance(user)
+            error_on_save = user.save_instance()
             response = (
                 {
                     'id': user.id,
@@ -31,8 +34,10 @@ class UsersView(Resource):
                 )
             return response
 
+    @db_expect
+    @check_token
     def get(self):
-        users = db.session.query(Users).all()
+        users = db.session.query(Users)
         results = []
         # TODO: add pagination/limit request.
         for user in users:
@@ -47,6 +52,7 @@ class UsersView(Resource):
 
 class SingleUserView(Resource):
 
+    @check_token
     def get(self, user_id):
         user = db.session.query(Users).filter_by(id=user_id).first()
         if not user:

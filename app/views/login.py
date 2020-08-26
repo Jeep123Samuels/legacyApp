@@ -1,30 +1,49 @@
+
+from auth_users.authentication import create_auth_tokens
 from flask import request
 from flask_restful import Resource
 
 from app import db
+from helpers.decorators import db_expect
 from helpers.status_codes import StatusCodes
-from helpers.utils import delete_instance, encrypt_password, save_instance
-from helpers.validations import check_required_fields
 from models.users import Users
 
 
-class AuthenticateView(Resource):
+class LoginView(Resource):
 
+    @db_expect
     def post(self):
-        user = Users(**request.get_json())
-        error_on_save = save_instance(user)
-        response = (
-            {
-                'id': user.id,
-                'username': user.username,
-                'text': 'User successfully saved',
-            },
-            StatusCodes.CREATED,
-        )
-        # If something went wrong
-        if error_on_save:
-            response = (
-                error_on_save.args[0],
-                StatusCodes.NOT_FOUND,
+        username = request.get_json().get('username')
+        password = request.get_json().get('password')
+
+        # Check correct parameters passed
+        if not password or not username:
+            return (
+                {'error': 'Missing password/username parameters.'},
+                StatusCodes.BAD_REQUEST,
             )
-        return response
+
+        user = db.session.query(Users).filter_by(username=username).first()
+        # If user not pulled from db...
+        if not user:
+            return (
+                {'error': f'Username - {username} cannot be found.'},
+                StatusCodes.BAD_REQUEST,
+            )
+
+        # Return success if correct password
+        if user.is_correct_password(password):
+            tokens = create_auth_tokens(user_id=user.id)
+            return (
+                {
+                    'message': 'Authenticated Succeeded.',
+                    'results': tokens,
+                },
+                StatusCodes.OK,
+            )
+
+        # If something went wrong
+        return (
+            {'message': 'Authenticated Failed.'},
+            StatusCodes.BAD_REQUEST,
+        )

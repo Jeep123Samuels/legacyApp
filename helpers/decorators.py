@@ -1,17 +1,15 @@
 from functools import wraps
 
-from flask import make_response
-
 from helpers.status_codes import StatusCodes as Status
 
 
 def db_expect(func):
     @wraps(func)
-    def wrapper():
+    def wrapper(*args, **kwargs):
         try:
-            return func()
+            return func(*args, **kwargs)
         except Exception as e:
-            return make_response(
+            return (
                 e.args[0],
                 Status.BAD_REQUEST,
             )

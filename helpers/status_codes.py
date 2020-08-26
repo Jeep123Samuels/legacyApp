@@ -5,7 +5,6 @@ class StatusCodes:
     SWITCHING_PROTOCOLS: int = 101
     PROCESSING: int = 102
 
-
     # 2XX Success
     OK: int = 200
     CREATED: int = 201
@@ -18,7 +17,6 @@ class StatusCodes:
     ALREADY_REPORTED: int = 208
     IM_USED: int = 226
 
-
     # 3XX Redirection
     MULTIPLE_CHOICES: int = 300
     MOVED_PERMANENTLY: int = 301
@@ -28,7 +26,6 @@ class StatusCodes:
     USE_PROXY: int = 305
     TEMPORARY_REDIRECT: int = 307
     PERMANENT_REDIRECT: int = 308
-
 
     # 4XX Client Error
     BAD_REQUEST: int = 400
@@ -61,7 +58,6 @@ class StatusCodes:
     CONNECTION_CLOSED_WITHOUT_RESPONSE: int = 444
     UNAVAILABLE_FOR_LEGAL_REASONS: int = 451
     CLIENT_CLOSED_REQUEST: int = 499
-
 
     # 5XX Server Error
     INTERNAL_SERVER_ERROR: int = 500

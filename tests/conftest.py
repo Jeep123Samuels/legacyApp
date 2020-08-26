@@ -13,16 +13,16 @@ from app import db
 @pytest.fixture(scope='session')
 def app():
     """For some reason this needs to be defined again."""
-    from api import register_views
     from flask import Flask
     from flask_restful import Api
     from instance.config import app_config, FLASK_ENV
 
-    app = Flask('Test Furry Companion Service')
+    from api import register_views
+
+    app = Flask('Test')
     app.config.from_object(app_config[FLASK_ENV])
     app_api = Api(app=app)
-    app_api = register_views(api_obj=app_api)
-
+    register_views(api_obj=app_api)
     return app
 
 
@@ -44,12 +44,14 @@ def manage(app):
 
 @pytest.fixture
 def client(request, manage, app):
+    from models import AuthTokens
     from models import Users
 
     def teardown():
         # clear table after each test.
+        db.session.query(AuthTokens).delete()
         db.session.query(Users).delete()
         db.session.commit()
 
-    # request.addfinalizer(teardown)
+    request.addfinalizer(teardown)
     yield app.test_client()
