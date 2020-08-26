@@ -9,7 +9,8 @@ class Users(db.Model):
 
     __tablename__ = 'users'
 
-    id = db.Column('user_id', db.Integer, primary_key=True, autoincrement=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    authtoken = db.relationship('AuthTokens', backref='users', lazy=True)
     username = db.Column(db.String(50), unique=True, nullable=False)
     email = db.Column(db.String(150), unique=True, nullable=True)
     password = db.Column(db.String(255), nullable=False)

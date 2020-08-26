@@ -3,7 +3,7 @@ from flask_restful import Resource
 
 from app import db
 from helpers.status_codes import StatusCodes
-from helpers.utils import delete_instance, encrypt_password, save_instance
+from helpers.utils import save_instance
 from helpers.validations import check_required_fields
 from models.users import Users
 
@@ -36,8 +36,7 @@ class UsersView(Resource):
         results = []
         # TODO: add pagination/limit request.
         for user in users:
-            user = user.__dict__
-            del user['_sa_instance_state']
+            user = user.to_dict()
             del user['password']
             results.append(user)
         return (
@@ -55,28 +54,6 @@ class SingleUserView(Resource):
                 f'User not found for id => {user_id}\n',
                 StatusCodes.BAD_REQUEST,
             )
-        user = user.__dict__
-        del user['_sa_instance_state']
+        user = user.to_dict()
         del user['password']
         return user, StatusCodes.OK
-
-    def put(self, user_id):
-        user = db.session.query(Users).filter_by(id=user_id).first()
-        if not user:
-            return (
-                'User not found for id => {user_id}\n',
-                StatusCodes.BAD_REQUEST,
-            )
-
-    def delete(self, user_id):
-        user = db.session.query(Users).filter_by(id=user_id).first()
-        if not user:
-            return (
-                f'User not found for id => {user_id}',
-                StatusCodes.BAD_REQUEST,
-            )
-        delete_error = delete_instance(user)
-        return (
-            f'Successfully deleted user with id => {user_id}',
-            StatusCodes.OK,
-        ) if not delete_error else (delete_error.args[0], StatusCodes.NOT_FOUND,)
