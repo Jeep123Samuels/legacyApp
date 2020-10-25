@@ -1,28 +1,40 @@
+
 import base64
 import hashlib
 
-from sqlalchemy import exc
+from sqlalchemy import Column, DateTime, Integer, String, exc
+from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.orm import relationship
+from sqlalchemy.sql.functions import func
 
 from app import db
 from helpers.utils import HelperModel, encrypt_password
 
 
-class Users(HelperModel, db.Model):
+class Users(db.Model, HelperModel):
     """Represents the user table."""
 
     __tablename__ = 'users'
 
-    id = db.Column('user_id', db.Integer, primary_key=True, autoincrement=True)
-    username = db.Column(db.String(50), unique=True, nullable=False)
-    email = db.Column(db.String(150), unique=True, nullable=True)
-    password = db.Column(db.String(255), nullable=False)
-    created_on = db.Column(db.DateTime, default=db.func.now())
-    updated_on = db.Column(db.DateTime, default=db.func.now(), server_onupdate=db.func.now())
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    username = Column(String(50), unique=True, nullable=False)
+    email = Column(String(150), unique=True, nullable=True)
+    password = Column(String(255), nullable=False)
+    created_on = Column(DateTime, default=func.now())
+    updated_on = Column(DateTime, default=func.now(), server_onupdate=func.now())
 
     REQUIRED_FIELDS = {'username', 'password'}
 
+    @declared_attr
+    def authtoken(cls):
+        return relationship('AuthTokens', lazy=True)
+
+    def init(self, username, password):
+        self.username = username
+        self.password = password
+
     def is_correct_password(self, encrypted_str):
-        string_ = base64.b64decode(encrypted_str.decode('utf-8')).decode('utf-8')
+        string_ = base64.b64decode(encrypted_str).decode('utf-8')
         return hashlib.sha256(string_.encode()).hexdigest() == self.password
 
     def __repr__(self):

@@ -41,6 +41,7 @@ class ProductionConfig(Config):
     DEBUG = False
     TESTING = False
     FLASK_ENV = 'production'
+    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL')
 
 
 app_config = {
@@ -49,3 +50,4 @@ app_config = {
     'staging': StagingConfig,
     'production': ProductionConfig,
 }
+# postgres://xxoablmkxbqsnv:cb34b9b7e6d87f13f28594f36573583a03f8cf4a5155d403c067ea2a9b8c39aa@ec2-54-234-28-165.compute-1.amazonaws.com:5432/d5i6th3sd66gd1

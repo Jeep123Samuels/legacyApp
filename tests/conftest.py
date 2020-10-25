@@ -1,7 +1,7 @@
 """Global fixtures for app."""
+from datetime import datetime, timedelta
 
 import pytest
-
 
 from alembic.command import upgrade
 from alembic.config import Config
@@ -9,6 +9,22 @@ from flask_migrate import Migrate, MigrateCommand
 from flask_script import Manager
 
 from app import db
+
+
+@pytest.fixture
+def test_user_data() -> dict:
+    return {
+        'password': 'cGFzc3dvcmQ=',
+        'username': 'username',
+    }
+
+
+@pytest.fixture
+def test_token() -> dict:
+    return {
+        'refresh_token': 'refresh_token',
+        'token': 'token',
+    }
 
 
 @pytest.fixture(scope='session')
@@ -44,11 +60,27 @@ def manage(app):
 
 
 @pytest.fixture
-def client(request, manage, app):
+def client(request, manage, app, test_user_data, test_token):
+    from models import AuthTokens
     from models import Users
+
+    user = db.session.query(Users).filter_by(username=test_user_data['username']).first()
+    if not user:
+        user = Users(**test_user_data)
+        user.save_instance()
+
+    auth_token = db.session.query(AuthTokens).filter_by(user_id=user.id).first()
+
+    test_token['user_id'] = user.id
+    if not auth_token:
+        test_token['expiry_date'] = datetime.now() + timedelta(hours=1)
+        test_token['refresh_expiry_time'] = test_token['expiry_date']
+        auth_token = AuthTokens(**test_token)
+        auth_token.save_instance()
 
     def teardown():
         # clear table after each test.
+        db.session.query(AuthTokens).delete()
         db.session.query(Users).delete()
         db.session.commit()
 
