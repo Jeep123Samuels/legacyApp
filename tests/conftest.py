@@ -82,7 +82,7 @@ def client(request, manage, app, test_user_data, test_token):
         # clear table after each test.
         db.session.query(AuthTokens).delete()
         db.session.query(Users).delete()
-        db.session.commit()
+        # db.session.commit()
 
     request.addfinalizer(teardown)
     yield app.test_client()
