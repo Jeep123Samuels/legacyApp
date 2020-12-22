@@ -1,9 +1,10 @@
 from copy import deepcopy
 
 from sqlalchemy import Column, Enum, ForeignKey, Integer, String, exc
+from sqlalchemy.ext.declarative import declared_attr
 
 from app import db
-from helpers.choices import ShopListsStatus
+from helpers.choices import ShopListsStatus, UserProductStatus
 from helpers.utils import HelperModel
 
 
@@ -18,7 +19,7 @@ class Retailers(db.Model, HelperModel):
     contact_no = Column(String(20), nullable=True)
 
     def __repr__(self):
-        return f'<Retailers: {self.username} - {self.email}>'
+        return f'<Retailers: {self.name} - {self.location}>'
 
     def to_dict(self):
         data = self.__dict__
@@ -27,11 +28,30 @@ class Retailers(db.Model, HelperModel):
         return data
 
 
-shop_list_product = db.Table(
-    'shop_list_product', db.Model.metadata,
-    db.Column('products_id', db.Integer, db.ForeignKey('products.id')),
-    db.Column('shoplists_id', db.Integer, db.ForeignKey('shoplists.id')),
-)
+class ShopListsXProducts(db.Model, HelperModel):
+    """Represents the ShopListsXProducts table."""
+
+    __tablename__ = 'shop_lists_products'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    status = Column(Enum(UserProductStatus), default=UserProductStatus.not_found, nullable=False)
+
+    @declared_attr
+    def products_id(cls):
+        return Column(Integer, ForeignKey('products.id'))
+
+    @declared_attr
+    def shoplists_id(cls):
+        return Column(Integer, ForeignKey('shoplists.id'))
+
+    def __repr__(self):
+        return f'<ShopListsXProducts: {self.products_id} - {self.shoplists_id}>'
+
+    def to_dict(self):
+        data = self.__dict__
+        if '_sa_instance_state' in data:
+            del data['_sa_instance_state']
+        return data
 
 
 class Products(db.Model, HelperModel):
@@ -44,8 +64,6 @@ class Products(db.Model, HelperModel):
     image_url = Column(String(255), unique=True, nullable=True)
     retailer = Column(String(225), nullable=True)
     slug = Column(String(225), index=True, unique=True, nullable=False)
-
-    shoplists = db.relationship('ShopLists', secondary=shop_list_product)
 
     REQUIRED_FIELDS = {'description'}
 
@@ -80,32 +98,16 @@ class ShopLists(db.Model, HelperModel):
         default=ShopListsStatus.inactive,
         nullable=False,
     )
-    owner_id = Column(Integer, ForeignKey('users.id'), nullable=True)
-    products = db.relationship('Products', secondary=shop_list_product)
 
-    # user_id = db.relationship('Users', backref='user')
+    @declared_attr
+    def owner_id(cls):
+        return Column(Integer, ForeignKey('users.id'), nullable=True)
 
     def __repr__(self):
-        return f'<ShopList: {self.name} - {self.owner_id}>'
+        return f'<ShopLists: {self.name} - {self.owner_id}>'
 
     def to_dict(self):
         data = self.__dict__
         if '_sa_instance_state' in data:
             del data['_sa_instance_state']
         return data
-
-# class UserShopItems(db.Model, HelperModel):
-#     """Represents the UserShopItems table."""
-#
-#     __tablename__ = 'usershopitems'
-#
-#     id = Column(Integer, primary_key=True, autoincrement=True)
-#     description = Column(String(255), index=True, unique=True, nullable=False)
-#     retailer = Column(String(225), unique=True, nullable=False)
-#     slug = Column(String(225), index=True, unique=True, nullable=False)
-#
-#     def __repr__(self):
-#         return f'<ShopItems: {self.slug}>'
-#
-#     def to_dict(self):
-#         return self.__dict__

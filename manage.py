@@ -4,7 +4,6 @@ from flask_migrate import Migrate, MigrateCommand
 from flask_script import Manager
 
 from app import db
-from models import shop_items
 from models import users
 from instance.config import APP_SETTINGS, app_config
 

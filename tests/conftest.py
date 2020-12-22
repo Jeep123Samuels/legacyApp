@@ -61,8 +61,7 @@ def manage(app):
 
 @pytest.fixture
 def client(request, manage, app, test_user_data, test_token):
-    from models import AuthTokens
-    from models import Users
+    from models import AuthTokens, Users
 
     user = db.session.query(Users).filter_by(username=test_user_data['username']).first()
     if not user:
@@ -82,7 +81,8 @@ def client(request, manage, app, test_user_data, test_token):
         # clear table after each test.
         db.session.query(AuthTokens).delete()
         db.session.query(Users).delete()
-        # db.session.commit()
+
+        db.session.commit()
 
     request.addfinalizer(teardown)
     yield app.test_client()

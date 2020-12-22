@@ -1,56 +1,113 @@
 
-from helpers.choices import ShopListsStatus
-from models import Products, ShopLists
-from models.shop_items import shop_list_product
+import pytest
+
+from helpers.choices import ShopListsStatus, UserProductStatus
+from models import Products, ShopLists, ShopListsXProducts, Users
 from app import db
-from sqlalchemy import select, column
 
 
-def test_return_correct_adding_of_objects():
-    """Should return 200 return status with correct data posted."""
-    #
-    # a = dict(
-    #     description="Testing this shit out 500g number 2",
-    #     image_url="google.com",
-    #     retailer="PnP",
-    # )
-    # b = dict(
-    #     description="Testing this shit out 500g",
-    #     image_url="google.com2",
-    #     retailer="PnP1",
-    # )
-    # d = dict(
-    #     description="Elizabeth lotion 500g",
-    #     image_url="google.c",
-    #     retailer="Shoprite",
-    # )
-    # for n in [ d]:
-    #     product = Products(**n)
-    #     product.save_instance()
-    # for i in range(3):
-    #     c = dict(
-    #         name=f"default{i}",
-    #         status=ShopListsStatus.inactive,
-    #         owner_id=91,
-    #     )
-    #     shop_list = ShopLists(**c)
-    #     shop_list.save_instance()
-    print(dir(shop_list_product))
-    print(shop_list_product.columns)
-    shoplists_filter = select([ShopLists.products]).where(
-        ShopLists.id == column('shop_list_product.shoplists_id'))
-    print(products_filter)
-    shop_list_1 = db.session.query(ShopLists).filter_by(id=1).first()
-    shop_list_2 = db.session.query(ShopLists).filter_by(id=2).first()
-    # product = db.session.query(Products).filter_by(id=5).first()
-    # product.shoplists.append(shop_list_1)
-    # product.shoplists.append(shop_list_2)
-    # product.save_instance()
-    products = db.session.query(Products).filter(Products.id.in_(products_filter)).all()
-    print(products)
-    print(dir(shop_list_1))
-    print(shop_list_1.products[0])
-    for product in shop_list_1.products:
-        print(product.to_dict())
-    # print(dir(shop_list_1))
-    assert 2 == 1
+@pytest.fixture
+def create_products(request):
+    db.session.query(ShopListsXProducts).delete()
+    db.session.query(Products).delete()
+    db.session.commit()
+
+    product_a = dict(
+        description="Pasta 500g",
+        image_url="google.com",
+        retailer="PnP",
+    )
+    product_b = dict(
+        description="Salad 500g",
+        image_url="google.com2",
+        retailer="PnP1",
+    )
+    product_c = dict(
+        description="Elizabeth lotion 500g",
+        image_url="google.c",
+        retailer="Shoprite",
+    )
+    for n in [product_a, product_b, product_c]:
+        product = Products(**n)
+        product.save_instance()
+
+    def teardown():
+        # clear table after each test.
+        db.session.query(ShopListsXProducts).delete()
+        db.session.query(Products).delete()
+        db.session.commit()
+
+    request.addfinalizer(teardown)
+    yield
+
+
+@pytest.fixture
+def create_shop_lists(request):
+    db.session.query(ShopListsXProducts).delete()
+    db.session.query(ShopLists).delete()
+    db.session.commit()
+
+    # Create Shop lists with Test user
+    user = db.session.query(Users).filter_by(username='username').first()
+
+    # given ... 3 ShopLists
+    for i in range(3):
+        c = dict(
+            name=f"default{i}",
+            status=ShopListsStatus.inactive,
+            owner_id=user.id,
+        )
+        shop_list = ShopLists(**c)
+        shop_list.save_instance()
+
+    def teardown():
+        # clear table after each test.
+        db.session.query(ShopListsXProducts).delete()
+        db.session.query(ShopLists).delete()
+        db.session.commit()
+
+    request.addfinalizer(teardown)
+    yield
+
+
+def test_correct_object_hierarchy_for_products_and_shopping_lists(
+    client,
+    create_products,
+    create_shop_lists,
+):
+    """Should correctly create and pull objects with desired linkage."""
+    # given
+    # ... 3 products and 3 shop lists for an user
+    user = db.session.query(Users).filter_by(username='username').first()
+    shopping_lists = db.session.query(ShopLists).filter_by(owner_id=user.id).all()
+    products = db.session.query(Products).all()
+
+    # when ... user add two products to shop list one
+    shop_list_1 = shopping_lists[0]
+    product_1 = products[0]
+    product_2 = products[1]
+
+    # add product 1
+    add_product: dict = dict(
+        products_id=product_1.id,
+        shoplists_id=shop_list_1.id,
+        status=UserProductStatus.searching,
+    )
+    add_product = ShopListsXProducts(**add_product)
+    add_product.save_instance()
+
+    # add product 2
+    add_product: dict = dict(
+        products_id=product_2.id,
+        shoplists_id=shop_list_1.id,
+        status=UserProductStatus.searching,
+    )
+    add_product = ShopListsXProducts(**add_product)
+    add_product.save_instance()
+
+    # then ... we expect these to products to be linked to the shopping list
+    shopping_list_items = db.session.query(
+        ShopListsXProducts).filter_by(shoplists_id=shop_list_1.id).all()
+    for item in shopping_list_items:
+        assert item.products_id in [product_2.id, product_1.id]
+    assert len(shopping_list_items) == 2

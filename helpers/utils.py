@@ -15,7 +15,6 @@ class HelperModel:
         except exc.SQLAlchemyError as e:
             return e
 
-
     def delete_instance(self):
         try:
             db.session.delete(self)
