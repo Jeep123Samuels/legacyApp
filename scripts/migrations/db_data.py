@@ -95,8 +95,8 @@ specie_data: dict = {
         dict(description='Deb protect', amount=26.79, occurred_on='08-01-21', storage_id=1),
         dict(description='Interest', amount=7.35, occurred_on='08-01-21', storage_id=1),
         # dict(description=steam, amount=68.38, occurred_on='08-01-21', storage_id=1),
+        dict(description=spar_moor, amount=515.14, occurred_on='09-01-21', storage_id=1),
         # dict(description=spar_moor, amount=515.14, occurred_on='09-01-21', storage_id=1),
-
     ],
     'debit_events': [
         dict(description=db_transfer, amount=500, occurred_on='21-12-20', storage_id=0),

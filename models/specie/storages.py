@@ -19,14 +19,14 @@ class Storages(db.Model, HelperModel):
     created_on = Column(DateTime, default=func.now(), nullable=False)
     total = Column(Float, nullable=False)
 
-    REQUIRED_FIELDS = {'description', 'total'}
+    REQUIRED_FIELDS = {'description', 'total', 'user_id'}
 
     @declared_attr
     def user_id(cls):
         return Column(Integer, ForeignKey('users.id'), nullable=True)
 
     def __repr__(self):
-        return f'<DebitEvents: {self.description} - {self.total}>'
+        return f'<Storages: {self.description} - {self.total}>'
 
     def to_dict(self):
         data = self.__dict__
