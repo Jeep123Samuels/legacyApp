@@ -35,6 +35,8 @@ specie_data: dict = {
         dict(description='Atm Cash', amount=250, occurred_on='06-01-21', storage_id=2),
         dict(description='School', amount=3000, occurred_on='07-01-21', storage_id=2),
         dict(description='School', amount=846, occurred_on='11-01-21', storage_id=2),
+        dict(description='transfer', amount=150, occurred_on='18-01-21', storage_id=2),
+
 
         # CD events related
         dict(description=airtime, amount=15, occurred_on='18-12-20', storage_id=1),
@@ -94,9 +96,29 @@ specie_data: dict = {
         dict(description=airtime, amount=15, occurred_on='08-01-21', storage_id=1),
         dict(description='Deb protect', amount=26.79, occurred_on='08-01-21', storage_id=1),
         dict(description='Interest', amount=7.35, occurred_on='08-01-21', storage_id=1),
-        # dict(description=steam, amount=68.38, occurred_on='08-01-21', storage_id=1),
+        dict(description=steam, amount=68.38, occurred_on='08-01-21', storage_id=1),
         dict(description=spar_moor, amount=515.14, occurred_on='09-01-21', storage_id=1),
-        # dict(description=spar_moor, amount=515.14, occurred_on='09-01-21', storage_id=1),
+        dict(description=spar_moor, amount=222.41, occurred_on='11-01-21', storage_id=1),
+        dict(description='Grain Bucket', amount=315, occurred_on='12-01-21', storage_id=1),
+        dict(description=spar_moor, amount=88.96, occurred_on='14-01-21', storage_id=1),
+        dict(description='Amazon video', amount=94.26, occurred_on='16-01-21', storage_id=1),
+        dict(description=spar_moor, amount=225.89, occurred_on='17-01-21', storage_id=1),
+        dict(description=transfer_debit, amount=150, occurred_on='18-01-21', storage_id=1),
+        dict(description=spar_moor, amount=59.97, occurred_on='18-01-21', storage_id=1),
+        dict(description=spar_moor, amount=69.99, occurred_on='18-01-21', storage_id=1),
+        dict(description=spar_moor, amount=142.25, occurred_on='20-01-21', storage_id=1),
+        dict(description='takealot carpet', amount=1217.20, occurred_on='20-01-21', storage_id=1),
+        dict(description='Netflix', amount=169.00, occurred_on='21-01-21', storage_id=1),
+        dict(description=overberg_moor, amount=68.11, occurred_on='21-01-21', storage_id=1),
+        dict(description=airtime, amount=15, occurred_on='22-01-21', storage_id=1),
+        dict(description=spar_moor, amount=51.98, occurred_on='22-01-21', storage_id=1),
+        dict(description=spar_moor, amount=385.66, occurred_on='22-01-21', storage_id=1),
+
+        # dict(description='petrol', amount=150.00, occurred_on='22-01-21', storage_id=1),
+        # dict(description='midas', amount=596.10, occurred_on='23-01-21', storage_id=1),
+        # dict(description='malmesbury agri gif', amount=159.14, occurred_on='23-01-21', storage_id=1),
+        # dict(description='petrol', amount=300, occurred_on='24-01-21', storage_id=1),
+        # dict(description=spar_moor, amount=169.19, occurred_on='24-01-21', storage_id=1),
     ],
     'debit_events': [
         dict(description=db_transfer, amount=500, occurred_on='21-12-20', storage_id=0),
@@ -107,6 +129,8 @@ specie_data: dict = {
         dict(description='School', amount=3000, occurred_on='07-01-21', storage_id=2),
         dict(description='Payment', amount=715, occurred_on='09-01-21', storage_id=2),
 
+        dict(description='Work Pay', amount=36385.02, occurred_on='22-01-21', storage_id=2),
+
         # CD events related
         dict(description=db_transfer, amount=10323, occurred_on='21-12-20', storage_id=1),
         dict(description=db_transfer, amount=1000, occurred_on='02-01-21', storage_id=1),
@@ -116,9 +140,12 @@ specie_data: dict = {
 
     ],
     'storages': [
-        dict(description='Money Call', total=6000.39),
-        dict(description='CD', total=-16490.50),
-        dict(description='DB', total=36466.47),
+        dict(description='Money Call', occurred_on='16-12-20', total=6000.39),
+        dict(description='CD', occurred_on='16-12-20', total=-16490.50),
+        dict(description='DB', occurred_on='16-12-20', total=36466.47),
+        # dict(description='Money Call', occurred_on='24-01-21', total=6000.39),
+        # dict(description='CD', occurred_on='24-01-21', total=-16490.50),
+        # dict(description='DB', occurred_on='24-01-21', total=36466.47),
     ],
 }
 

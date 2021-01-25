@@ -14,7 +14,7 @@ class Storages(db.Model, HelperModel):
     __tablename__ = 'storages'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    description = Column(String(255), index=True, unique=True, nullable=False)
+    description = Column(String(255), index=True, unique=False, nullable=False)
     occurred_on = Column(DateTime, nullable=True)
     created_on = Column(DateTime, default=func.now(), nullable=False)
     total = Column(Float, nullable=False)
